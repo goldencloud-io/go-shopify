@@ -1275,3 +1275,28 @@ func validShippingLines() ShippingLines {
 		},
 	}
 }
+
+func TestOrderWithRefund(t *testing.T) {
+	setup()
+	defer teardown()
+
+	httpmock.RegisterResponder("GET", fmt.Sprintf("https://fooshop.myshopify.com/%s/orders/123456.json", client.pathPrefix),
+		httpmock.NewBytesResponder(200, loadFixture("order_with_refund.json")))
+
+	order, err := client.Order.Get(123456, nil)
+	if err != nil {
+		t.Errorf("Order.List returned error: %v", err)
+	}
+
+	if len(order.Refunds) == 0 {
+		t.Error("Expected Refunds to not be nil")
+	}
+
+	if len(order.Refunds[0].RefundLineItems) == 0 {
+		t.Error("Expected RefundLineItems to not be nil")
+	}
+
+	if order.Refunds[0].RefundLineItems[0].RestockType != "return" {
+		t.Errorf(`Expected RestockType to be "return" but received %v`, order.Refunds[0].RefundLineItems[0].RestockType)
+	}
+}
