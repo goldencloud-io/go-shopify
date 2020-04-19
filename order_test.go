@@ -721,6 +721,8 @@ func TestOrderWithRefund(t *testing.T) {
 
 	if order.Refunds[0].RefundLineItems[0].RestockType != "return" {
 		t.Errorf(`Expected RestockType to be "return" but received %v`, order.Refunds[0].RefundLineItems[0].RestockType)
+	}
+}
 
 // TestLineItemUnmarshalJSON tests unmarsalling a LineItem from json
 func TestLineItemUnmarshalJSON(t *testing.T) {
