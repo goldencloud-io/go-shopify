@@ -1,4 +1,4 @@
-module github.com/bold-commerce/go-shopify
+module pkg.goldencloud.dev/go-shopify
 
 go 1.13
 
