@@ -407,6 +407,65 @@ func TestOrderUpdate(t *testing.T) {
 	}
 }
 
+func TestOrderCancel(t *testing.T) {
+	setup()
+	defer teardown()
+
+	httpmock.RegisterResponder("POST", fmt.Sprintf("https://fooshop.myshopify.com/%s/orders/123456/cancel.json", client.pathPrefix),
+		httpmock.NewBytesResponder(200, loadFixture("order_with_transaction.json")))
+
+	order, err := client.Order.Cancel(123456, nil)
+	if err != nil {
+		t.Errorf("Order.Update returned error: %v", err)
+	}
+	// Check that dates are parsed
+	timezone, _ := time.LoadLocation("America/New_York")
+
+	d := time.Date(2016, time.May, 17, 4, 14, 36, 0, timezone)
+	if !d.Equal(*order.CancelledAt) {
+		t.Errorf("Order.CancelledAt returned %+v, expected %+v", order.CancelledAt, d)
+	}
+
+	orderTests(t, *order)
+}
+
+func TestOrderClose(t *testing.T) {
+	setup()
+	defer teardown()
+
+	httpmock.RegisterResponder("POST", fmt.Sprintf("https://fooshop.myshopify.com/%s/orders/123456/close.json", client.pathPrefix),
+		httpmock.NewStringResponder(200, `{"order":{"closed_at":"2016-05-17T04:14:36-04:00"}}`))
+
+	order, err := client.Order.Close(123456)
+	if err != nil {
+		t.Errorf("Order.Update returned error: %v", err)
+	}
+	// Check that dates are parsed
+	timezone, _ := time.LoadLocation("America/New_York")
+
+	d := time.Date(2016, time.May, 17, 4, 14, 36, 0, timezone)
+	if !d.Equal(*order.ClosedAt) {
+		t.Errorf("Order.ClosedAt returned %+v, expected %+v", order.ClosedAt, d)
+	}
+}
+
+func TestOrderOpen(t *testing.T) {
+	setup()
+	defer teardown()
+
+	httpmock.RegisterResponder("POST", fmt.Sprintf("https://fooshop.myshopify.com/%s/orders/123456/open.json", client.pathPrefix),
+		httpmock.NewStringResponder(200, `{"order":{"closed_at":null}}`))
+
+	order, err := client.Order.Open(123456)
+	if err != nil {
+		t.Errorf("Order.Update returned error: %v", err)
+	}
+
+	if order.ClosedAt != nil {
+		t.Errorf("Order.ClosedAt returned %+v, expected nil", order.ClosedAt)
+	}
+}
+
 func TestOrderListMetafields(t *testing.T) {
 	setup()
 	defer teardown()
@@ -816,6 +875,72 @@ func TestLineItemUnmarshalJSONPropertiesObject(t *testing.T) {
 	testLineItem(t, expected, actual)
 }
 
+// TestShippingLines tests unmarshalling ShippingLines.RequestFulfillmentServiceID from a JSON string
+func TestShippingLines_UnmarshallJSON(t *testing.T) {
+	setup()
+	defer teardown()
+
+	actual := ShippingLines{}
+
+	err := actual.UnmarshalJSON(loadFixture("shippinglines/valid.json"))
+	if err != nil {
+		t.Errorf("ShippingLines.UnmarshalJSON returned error: %v", err)
+	}
+
+	expected := validShippingLines()
+
+	testShippingLines(t, expected, actual)
+}
+
+// TestShippingLines tests unmarshalling ShippingLines.RequestFulfillmentServiceID from a JSON Number
+func TestShippingLines_UnmarshallJSON_RequestFulfillmentServiceIDNumber(t *testing.T) {
+	setup()
+	defer teardown()
+
+	actual := ShippingLines{}
+
+	err := actual.UnmarshalJSON(loadFixture("shippinglines/requested_fulfillment_service_id_number.json"))
+	if err != nil {
+		t.Errorf("ShippingLines.UnmarshalJSON returned error: %v", err)
+	}
+
+	expected := validShippingLines()
+	expected.RequestedFulfillmentServiceID = "123456"
+
+	testShippingLines(t, expected, actual)
+}
+
+// TestShippingLines tests unmarshalling ShippingLines.RequestFulfillmentServiceID from a JSON null
+func TestShippingLines_UnmarshallJSON_RequestFulfillmentServiceIDNull(t *testing.T) {
+	setup()
+	defer teardown()
+
+	actual := ShippingLines{}
+
+	err := actual.UnmarshalJSON(loadFixture("shippinglines/requested_fulfillment_service_id_null.json"))
+	if err != nil {
+		t.Errorf("ShippingLines.UnmarshalJSON returned error: %v", err)
+	}
+
+	expected := validShippingLines()
+	expected.RequestedFulfillmentServiceID = ""
+
+	testShippingLines(t, expected, actual)
+}
+
+// TestShippingLines tests unmarshalling ShippingLines.RequestFulfillmentServiceID from a malformed JSON
+func TestShippingLines_UnmarshallJSON_RequestFulfillmentServiceIDInvalid(t *testing.T) {
+	setup()
+	defer teardown()
+
+	actual := ShippingLines{}
+
+	err := actual.UnmarshalJSON(loadFixture("shippinglines/requested_fulfillment_service_id_invalid.json"))
+	if err == nil || !strings.Contains(err.Error(), "invalid character '}'") {
+		t.Errorf("ShippingLines.UnmarshalJSON expected invalid character '}' %v", err)
+	}
+}
+
 func testLineItem(t *testing.T, expected, actual LineItem) {
 	if actual.ID != expected.ID {
 		t.Errorf("LineItem.ID should be (%v), was (%v)", expected.ID, actual.ID)
@@ -990,6 +1115,46 @@ func testTaxLines(t *testing.T, expected, actual []TaxLine) {
 	}
 }
 
+func testShippingLines(t *testing.T, expected, actual ShippingLines) {
+	if actual.ID != expected.ID {
+		t.Errorf("ShippingLines.ID should be (%v), was (%v)", expected.ID, actual.ID)
+	}
+
+	if actual.Title != expected.Title {
+		t.Errorf("ShippingLines.Title should be (%v), was (%v)", expected.Title, actual.Title)
+	}
+
+	if !actual.Price.Equals(*expected.Price) {
+		t.Errorf("ShippingLines.Price should be (%v), was (%v)", expected.Price, actual.Price)
+	}
+
+	if actual.Code != expected.Code {
+		t.Errorf("ShippingLines.Code should be (%v), was (%v)", expected.Code, actual.Code)
+	}
+
+	if actual.Source != expected.Source {
+		t.Errorf("ShippingLines.Source should be (%v), was (%v)", expected.Source, actual.Source)
+	}
+
+	if actual.Phone != expected.Phone {
+		t.Errorf("ShippingLines.Phone should be (%v), was (%v)", expected.Phone, actual.Phone)
+	}
+
+	if actual.RequestedFulfillmentServiceID != expected.RequestedFulfillmentServiceID {
+		t.Errorf("ShippingLines.RequestedFulfillmentServiceID should be (%v), was (%v)", expected.RequestedFulfillmentServiceID, actual.RequestedFulfillmentServiceID)
+	}
+
+	if actual.DeliveryCategory != expected.DeliveryCategory {
+		t.Errorf("ShippingLines.DeliveryCategory should be (%v), was (%v)", expected.DeliveryCategory, actual.DeliveryCategory)
+	}
+
+	if actual.CarrierIdentifier != expected.CarrierIdentifier {
+		t.Errorf("ShippingLines.CarrierIdentifier should be (%v), was (%v)", expected.CarrierIdentifier, actual.CarrierIdentifier)
+	}
+
+	testTaxLines(t, expected.TaxLines, actual.TaxLines)
+}
+
 func propertiesEmptyStructLientItem() LineItem {
 	return LineItem{
 		Properties: []NoteAttribute{},
@@ -1102,5 +1267,62 @@ func validLineItem() LineItem {
 			ValueType:   "percent",
 			Amount:      "25.00",
 		},
+	}
+}
+
+func validShippingLines() ShippingLines {
+	price := decimal.New(400, -2)
+	tl1Price := decimal.New(1350, -2)
+	tl1Rate := decimal.New(6, -2)
+	tl2Price := decimal.New(1250, -2)
+	tl2Rate := decimal.New(5, -2)
+
+	return ShippingLines{
+		ID:                            int64(254721542),
+		Title:                         "Small Packet International Air",
+		Price:                         &price,
+		Code:                          "INT.TP",
+		Source:                        "canada_post",
+		Phone:                         "",
+		RequestedFulfillmentServiceID: "third_party_fulfillment_service_id",
+		DeliveryCategory:              "",
+		CarrierIdentifier:             "third_party_carrier_identifier",
+		TaxLines: []TaxLine{
+			{
+				Title: "State tax",
+				Price: &tl1Price,
+				Rate:  &tl1Rate,
+			},
+			{
+				Title: "Federal tax",
+				Price: &tl2Price,
+				Rate:  &tl2Rate,
+			},
+		},
+	}
+}
+
+func TestOrderWithRefund(t *testing.T) {
+	setup()
+	defer teardown()
+
+	httpmock.RegisterResponder("GET", fmt.Sprintf("https://fooshop.myshopify.com/%s/orders/123456.json", client.pathPrefix),
+		httpmock.NewBytesResponder(200, loadFixture("order_with_refund.json")))
+
+	order, err := client.Order.Get(123456, nil)
+	if err != nil {
+		t.Errorf("Order.List returned error: %v", err)
+	}
+
+	if len(order.Refunds) == 0 {
+		t.Error("Expected Refunds to not be nil")
+	}
+
+	if len(order.Refunds[0].RefundLineItems) == 0 {
+		t.Error("Expected RefundLineItems to not be nil")
+	}
+
+	if order.Refunds[0].RefundLineItems[0].RestockType != "return" {
+		t.Errorf(`Expected RestockType to be "return" but received %v`, order.Refunds[0].RefundLineItems[0].RestockType)
 	}
 }
