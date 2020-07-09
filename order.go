@@ -346,6 +346,7 @@ type Refund struct {
 	UserId          int64            `json:"user_id,omitempty"`
 	RefundLineItems []RefundLineItem `json:"refund_line_items,omitempty"`
 	Transactions    []Transaction    `json:"transactions,omitempty"`
+	OrderAdjustments []OrderAdjustment `json: order_adjustments,omitempty`
 }
 
 type RefundLineItem struct {
@@ -357,6 +358,18 @@ type RefundLineItem struct {
 	TotalTax    *decimal.Decimal `json:"total_tax,omitempty"`
 	RestockType string           `json:"restock_type,omitempty"`
 	LocationId  int64            `json:"location_id,omitempty"`
+}
+
+type OrderAdjustment struct {
+	Id              int64            `json:"id,omitempty"`
+	OrderId         int64            `json:"order_id,omitempty"`
+	RefundId	int64 `json:"refund_id,omitempty"`
+	Amount *decimal.Decimal `json:"amount,omitempty"`
+	TaxAmount *decimal.Decimal `json:"tax_amount,omitempty"`
+	Kind string `json:"kind"`
+	Reason string `json:"reason"`
+	AmountSet map[string]interface{} `json:"amount_set"`
+	TaxAmountSet map[string]interface{} `json:"tax_amount_set"`
 }
 
 // List orders
