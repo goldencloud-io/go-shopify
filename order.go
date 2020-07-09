@@ -346,7 +346,7 @@ type Refund struct {
 	UserId          int64            `json:"user_id,omitempty"`
 	RefundLineItems []RefundLineItem `json:"refund_line_items,omitempty"`
 	Transactions    []Transaction    `json:"transactions,omitempty"`
-	OrderAdjustments []OrderAdjustment `json: order_adjustments,omitempty`
+	OrderAdjustments []OrderAdjustment `json:"order_adjustments,omitempty"`
 }
 
 type RefundLineItem struct {
