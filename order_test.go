@@ -757,7 +757,6 @@ func TestOrderCancelFulfillment(t *testing.T) {
 	FulfillmentTests(t, *returnedFulfillment)
 }
 
-
 func TestOrderWithRefund(t *testing.T) {
 	setup()
 	defer teardown()
@@ -1028,7 +1027,8 @@ func testLineItem(t *testing.T, expected, actual LineItem) {
 		}
 	}
 
-	testProperties(t, expected.Properties, actual.Properties)
+	// removed by Trueprofit due to unmarshal error
+	// testProperties(t, expected.Properties, actual.Properties)
 
 	if actual.ProductExists != expected.ProductExists {
 		t.Errorf("LineItem.ProductExists should be (%v), was (%v)", expected.ProductExists, actual.ProductExists)
@@ -1079,6 +1079,8 @@ func testLineItem(t *testing.T, expected, actual LineItem) {
 	}
 }
 
+// removed by Trueprofit due to unmarshal error
+/*
 func testProperties(t *testing.T, expected, actual []NoteAttribute) {
 	if len(expected) != len(actual) {
 		t.Errorf("LineItem.Properties expected len (%d) actual (%d)", len(expected), len(actual))
@@ -1094,6 +1096,7 @@ func testProperties(t *testing.T, expected, actual []NoteAttribute) {
 		}
 	}
 }
+*/
 
 func testTaxLines(t *testing.T, expected, actual []TaxLine) {
 	if len(expected) != len(actual) {
@@ -1157,18 +1160,20 @@ func testShippingLines(t *testing.T, expected, actual ShippingLines) {
 
 func propertiesEmptyStructLientItem() LineItem {
 	return LineItem{
-		Properties: []NoteAttribute{},
+		// removed by Trueprofit due to unmarshal error
+		// Properties: []NoteAttribute{},
 	}
 }
 
 func propertiesStructLientItem() LineItem {
 	return LineItem{
-		Properties: []NoteAttribute{
-			NoteAttribute{
-				Name:  "property 1",
-				Value: float64(3),
-			},
-		},
+		// removed by Trueprofit due to unmarshal error
+		// Properties: []NoteAttribute{
+		// 	NoteAttribute{
+		// 		Name:  "property 1",
+		// 		Value: float64(3),
+		// 	},
+		// },
 	}
 }
 
@@ -1198,16 +1203,17 @@ func validLineItem() LineItem {
 		RequiresShipping:           true,
 		VariantInventoryManagement: "shopify",
 		PreTaxPrice:                &preTaxPrice,
-		Properties: []NoteAttribute{
-			NoteAttribute{
-				Name:  "note 1",
-				Value: "one",
-			},
-			NoteAttribute{
-				Name:  "note 2",
-				Value: float64(2),
-			},
-		},
+		// removed by Trueprofit due to unmarshal error
+		// Properties: []NoteAttribute{
+		// 	NoteAttribute{
+		// 		Name:  "note 1",
+		// 		Value: "one",
+		// 	},
+		// 	NoteAttribute{
+		// 		Name:  "note 2",
+		// 		Value: float64(2),
+		// 	},
+		// },
 		ProductExists:       true,
 		FulfillableQuantity: 1,
 		Grams:               100,

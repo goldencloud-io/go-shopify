@@ -37,14 +37,15 @@ type DraftOrderServiceOp struct {
 
 // DraftOrder represents a shopify draft order
 type DraftOrder struct {
-	ID              int64            `json:"id,omitempty"`
-	OrderID         int64            `json:"order_id,omitempty"`
-	Name            string           `json:"name,omitempty"`
-	Customer        *Customer        `json:"customer,omitempty"`
-	ShippingAddress *Address         `json:"shipping_address,omitempty"`
-	BillingAddress  *Address         `json:"billing_address,omitempty"`
-	Note            string           `json:"note,omitempty"`
-	NoteAttributes  []NoteAttribute  `json:"note_attribute,omitempty"`
+	ID              int64     `json:"id,omitempty"`
+	OrderID         int64     `json:"order_id,omitempty"`
+	Name            string    `json:"name,omitempty"`
+	Customer        *Customer `json:"customer,omitempty"`
+	ShippingAddress *Address  `json:"shipping_address,omitempty"`
+	BillingAddress  *Address  `json:"billing_address,omitempty"`
+	Note            string    `json:"note,omitempty"`
+	// removed by Trueprofit due to unmarshal error
+	// NoteAttributes  []NoteAttribute  `json:"note_attribute,omitempty"`
 	Email           string           `json:"email,omitempty"`
 	Currency        string           `json:"currency,omitempty"`
 	InvoiceSentAt   *time.Time       `json:"invoice_sent_at,omitempty"`

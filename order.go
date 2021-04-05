@@ -112,37 +112,38 @@ type Order struct {
 	BrowserIp             string           `json:"browser_ip,omitempty"`
 	BuyerAcceptsMarketing bool             `json:"buyer_accepts_marketing,omitempty"`
 	CancelReason          string           `json:"cancel_reason,omitempty"`
-	NoteAttributes        []NoteAttribute  `json:"note_attributes,omitempty"`
-	DiscountCodes         []DiscountCode   `json:"discount_codes,omitempty"`
-	LineItems             []LineItem       `json:"line_items,omitempty"`
-	ShippingLines         []ShippingLines  `json:"shipping_lines,omitempty"`
-	Transactions          []Transaction    `json:"transactions,omitempty"`
-	AppID                 int              `json:"app_id,omitempty"`
-	CustomerLocale        string           `json:"customer_locale,omitempty"`
-	LandingSite           string           `json:"landing_site,omitempty"`
-	ReferringSite         string           `json:"referring_site,omitempty"`
-	SourceName            string           `json:"source_name,omitempty"`
-	ClientDetails         *ClientDetails   `json:"client_details,omitempty"`
-	Tags                  string           `json:"tags,omitempty"`
-	LocationId            int64            `json:"location_id,omitempty"`
-	PaymentGatewayNames   []string         `json:"payment_gateway_names,omitempty"`
-	ProcessingMethod      string           `json:"processing_method,omitempty"`
-	Refunds               []Refund         `json:"refunds,omitempty"`
-	UserId                int64            `json:"user_id,omitempty"`
-	OrderStatusUrl        string           `json:"order_status_url,omitempty"`
-	Gateway               string           `json:"gateway,omitempty"`
-	Confirmed             bool             `json:"confirmed,omitempty"`
-	TotalPriceUSD         *decimal.Decimal `json:"total_price_usd,omitempty"`
-	CheckoutToken         string           `json:"checkout_token,omitempty"`
-	Reference             string           `json:"reference,omitempty"`
-	SourceIdentifier      string           `json:"source_identifier,omitempty"`
-	SourceURL             string           `json:"source_url,omitempty"`
-	DeviceID              int64            `json:"device_id,omitempty"`
-	Phone                 string           `json:"phone,omitempty"`
-	LandingSiteRef        string           `json:"landing_site_ref,omitempty"`
-	CheckoutID            int64            `json:"checkout_id,omitempty"`
-	ContactEmail          string           `json:"contact_email,omitempty"`
-	Metafields            []Metafield      `json:"metafields,omitempty"`
+	// removed by Trueprofit due to unmarshal error
+	// NoteAttributes        []NoteAttribute  `json:"note_attributes,omitempty"`
+	DiscountCodes       []DiscountCode   `json:"discount_codes,omitempty"`
+	LineItems           []LineItem       `json:"line_items,omitempty"`
+	ShippingLines       []ShippingLines  `json:"shipping_lines,omitempty"`
+	Transactions        []Transaction    `json:"transactions,omitempty"`
+	AppID               int              `json:"app_id,omitempty"`
+	CustomerLocale      string           `json:"customer_locale,omitempty"`
+	LandingSite         string           `json:"landing_site,omitempty"`
+	ReferringSite       string           `json:"referring_site,omitempty"`
+	SourceName          string           `json:"source_name,omitempty"`
+	ClientDetails       *ClientDetails   `json:"client_details,omitempty"`
+	Tags                string           `json:"tags,omitempty"`
+	LocationId          int64            `json:"location_id,omitempty"`
+	PaymentGatewayNames []string         `json:"payment_gateway_names,omitempty"`
+	ProcessingMethod    string           `json:"processing_method,omitempty"`
+	Refunds             []Refund         `json:"refunds,omitempty"`
+	UserId              int64            `json:"user_id,omitempty"`
+	OrderStatusUrl      string           `json:"order_status_url,omitempty"`
+	Gateway             string           `json:"gateway,omitempty"`
+	Confirmed           bool             `json:"confirmed,omitempty"`
+	TotalPriceUSD       *decimal.Decimal `json:"total_price_usd,omitempty"`
+	CheckoutToken       string           `json:"checkout_token,omitempty"`
+	Reference           string           `json:"reference,omitempty"`
+	SourceIdentifier    string           `json:"source_identifier,omitempty"`
+	SourceURL           string           `json:"source_url,omitempty"`
+	DeviceID            int64            `json:"device_id,omitempty"`
+	Phone               string           `json:"phone,omitempty"`
+	LandingSiteRef      string           `json:"landing_site_ref,omitempty"`
+	CheckoutID          int64            `json:"checkout_id,omitempty"`
+	ContactEmail        string           `json:"contact_email,omitempty"`
+	Metafields          []Metafield      `json:"metafields,omitempty"`
 }
 
 type Address struct {
@@ -188,15 +189,16 @@ type LineItem struct {
 	RequiresShipping           bool             `json:"requires_shipping,omitempty"`
 	VariantInventoryManagement string           `json:"variant_inventory_management,omitempty"`
 	PreTaxPrice                *decimal.Decimal `json:"pre_tax_price,omitempty"`
-	Properties                 []NoteAttribute  `json:"properties,omitempty"`
-	ProductExists              bool             `json:"product_exists,omitempty"`
-	FulfillableQuantity        int              `json:"fulfillable_quantity,omitempty"`
-	Grams                      int              `json:"grams,omitempty"`
-	FulfillmentStatus          string           `json:"fulfillment_status,omitempty"`
-	TaxLines                   []TaxLine        `json:"tax_lines,omitempty"`
-	OriginLocation             *Address         `json:"origin_location,omitempty"`
-	DestinationLocation        *Address         `json:"destination_location,omitempty"`
-	AppliedDiscount            *AppliedDiscount `json:"applied_discount,omitempty"`
+	// removed by Trueprofit due to unmarshal error
+	// Properties                 []NoteAttribute  `json:"properties,omitempty"`
+	ProductExists       bool             `json:"product_exists,omitempty"`
+	FulfillableQuantity int              `json:"fulfillable_quantity,omitempty"`
+	Grams               int              `json:"grams,omitempty"`
+	FulfillmentStatus   string           `json:"fulfillment_status,omitempty"`
+	TaxLines            []TaxLine        `json:"tax_lines,omitempty"`
+	OriginLocation      *Address         `json:"origin_location,omitempty"`
+	DestinationLocation *Address         `json:"destination_location,omitempty"`
+	AppliedDiscount     *AppliedDiscount `json:"applied_discount,omitempty"`
 }
 
 // UnmarshalJSON custom unmarsaller for LineItem required to mitigate some older orders having LineItem.Properies
@@ -212,26 +214,29 @@ func (li *LineItem) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	// if the first character is a '[' we unmarshal into an array
-	if len(aux.Properties) > 0 && aux.Properties[0] == '[' {
-		var p []NoteAttribute
-		err = json.Unmarshal(aux.Properties, &p)
-		if err != nil {
-			return err
+	// removed by Trueprofit due to unmarshal error
+	/*
+		// if the first character is a '[' we unmarshal into an array
+		if len(aux.Properties) > 0 && aux.Properties[0] == '[' {
+			var p []NoteAttribute
+			err = json.Unmarshal(aux.Properties, &p)
+			if err != nil {
+				return err
+			}
+			li.Properties = p
+		} else { // else we unmarshal it into a struct
+			var p NoteAttribute
+			err = json.Unmarshal(aux.Properties, &p)
+			if err != nil {
+				return err
+			}
+			if p.Name == "" && p.Value == nil { // if the struct is empty we set properties to nil
+				li.Properties = nil
+			} else {
+				li.Properties = []NoteAttribute{p} // else we set them to an array with the property nested
+			}
 		}
-		li.Properties = p
-	} else { // else we unmarshal it into a struct
-		var p NoteAttribute
-		err = json.Unmarshal(aux.Properties, &p)
-		if err != nil {
-			return err
-		}
-		if p.Name == "" && p.Value == nil { // if the struct is empty we set properties to nil
-			li.Properties = nil
-		} else {
-			li.Properties = []NoteAttribute{p} // else we set them to an array with the property nested
-		}
-	}
+	*/
 
 	return nil
 }
@@ -240,10 +245,13 @@ type LineItemProperty struct {
 	Message string `json:"message"`
 }
 
+// removed by Trueprofit due to unmarshal error
+/*
 type NoteAttribute struct {
 	Name  string      `json:"name,omitempty"`
 	Value interface{} `json:"value,omitempty"`
 }
+*/
 
 // Represents the result from the orders/X.json endpoint
 type OrderResource struct {
@@ -338,14 +346,14 @@ type ClientDetails struct {
 }
 
 type Refund struct {
-	Id              int64            `json:"id,omitempty"`
-	OrderId         int64            `json:"order_id,omitempty"`
-	CreatedAt       *time.Time       `json:"created_at,omitempty"`
-	Note            string           `json:"note,omitempty"`
-	Restock         bool             `json:"restock,omitempty"`
-	UserId          int64            `json:"user_id,omitempty"`
-	RefundLineItems []RefundLineItem `json:"refund_line_items,omitempty"`
-	Transactions    []Transaction    `json:"transactions,omitempty"`
+	Id               int64             `json:"id,omitempty"`
+	OrderId          int64             `json:"order_id,omitempty"`
+	CreatedAt        *time.Time        `json:"created_at,omitempty"`
+	Note             string            `json:"note,omitempty"`
+	Restock          bool              `json:"restock,omitempty"`
+	UserId           int64             `json:"user_id,omitempty"`
+	RefundLineItems  []RefundLineItem  `json:"refund_line_items,omitempty"`
+	Transactions     []Transaction     `json:"transactions,omitempty"`
 	OrderAdjustments []OrderAdjustment `json:"order_adjustments,omitempty"`
 }
 
@@ -361,14 +369,14 @@ type RefundLineItem struct {
 }
 
 type OrderAdjustment struct {
-	Id              int64            `json:"id,omitempty"`
-	OrderId         int64            `json:"order_id,omitempty"`
-	RefundId	int64 `json:"refund_id,omitempty"`
-	Amount *decimal.Decimal `json:"amount,omitempty"`
-	TaxAmount *decimal.Decimal `json:"tax_amount,omitempty"`
-	Kind string `json:"kind"`
-	Reason string `json:"reason"`
-	AmountSet map[string]interface{} `json:"amount_set"`
+	Id           int64                  `json:"id,omitempty"`
+	OrderId      int64                  `json:"order_id,omitempty"`
+	RefundId     int64                  `json:"refund_id,omitempty"`
+	Amount       *decimal.Decimal       `json:"amount,omitempty"`
+	TaxAmount    *decimal.Decimal       `json:"tax_amount,omitempty"`
+	Kind         string                 `json:"kind"`
+	Reason       string                 `json:"reason"`
+	AmountSet    map[string]interface{} `json:"amount_set"`
 	TaxAmountSet map[string]interface{} `json:"tax_amount_set"`
 }
 
